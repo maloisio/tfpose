@@ -91,7 +91,7 @@ while cap.isOpened():
     draw_connections(frame, keypoints_with_scores, EDGES, 0.2)
     draw_keypoints(frame, keypoints_with_scores, 0.2)
 
-    # ------------------------ANGLES------------------------------
+    # ------------------------ANGLES---------------------------------
     y, x, c = frame.shape
     shaped = np.squeeze(np.multiply(keypoints_with_scores, [y, x, 1]))
 
