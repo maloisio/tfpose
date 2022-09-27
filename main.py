@@ -3,19 +3,20 @@ import numpy as np
 from matplotlib import pyplot as plt
 import cv2 as cv
 from collections import deque
+from scipy.spatial import distance as dist
 
 from tensorflow.lite.python.interpreter import Interpreter
 
 interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_lightning_3.tflite")
 interpreter.allocate_tensors()
 
-cap = cv.VideoCapture("serving2v2.mp4")
+cap = cv.VideoCapture("servingv2.mp4")
 
 EDGES = {
-    (0, 1): 'm',
-    (0, 2): 'c',
-    (1, 3): 'm',
-    (2, 4): 'c',
+    # (0, 1): 'm',
+    # (0, 2): 'c',
+    # (1, 3): 'm',
+    # (2, 4): 'c',
     (0, 5): 'm',
     (0, 6): 'c',
     (5, 7): 'm',
@@ -31,19 +32,33 @@ EDGES = {
     (12, 14): 'c',
     (14, 16): 'c'
 }
-paintedPoints = deque(maxlen=40)
+paintedPoints = deque(maxlen=30)
 savedPaintedPoints = []
 interestPoint = 0
 frameArray = []
+novoArray = deque(maxlen=30)
+
 
 def motionTrail(paintedPoints):
+    mediaX1 = np.sum(paintedPoints[0][0] + paintedPoints[1][0] + paintedPoints[2][0] + paintedPoints[3][0])
+    mediaY1 = np.sum(paintedPoints[0][1] + paintedPoints[1][1] + paintedPoints[2][1] + paintedPoints[3][1])
 
-    for i in np.arange(1, len(paintedPoints)):
-        if paintedPoints[i - 1] is None or paintedPoints[i] is None:
+    mediaX2 = np.sum(paintedPoints[4][0] + paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0])
+    mediaY2 = np.sum(paintedPoints[4][1] + paintedPoints[5][1] + paintedPoints[6][1] + paintedPoints[7][1])
+
+    novoArray.appendleft([int(mediaX1 / 4), int(mediaY1 / 4)])
+    novoArray.appendleft([int(mediaX2 / 4), int(mediaY2 / 4)])
+
+    for i in np.arange(1, len(novoArray)):
+        if novoArray[i - 1] is None or novoArray[i] is None:
             continue
         # thickness = int(np.sqrt(args1["buffer"] / float(i + 1)) * 2.5)
-        cv.line(frame, paintedPoints[i - 1], paintedPoints[i], (0, 0, 255), 2)
-        cv.line(frame2, paintedPoints[i - 1], paintedPoints[i], (0, 0, 255), 2)
+        if(dist.euclidean(novoArray[i], novoArray[i - 1]) < 60):
+            cv.line(frame, novoArray[i - 1], novoArray[i], (211, 0, 148), 2)
+            cv.line(frame2, novoArray[i - 1], novoArray[i], (211, 0, 148), 2)
+        else:
+            cv.line(frame, novoArray[i - 1], novoArray[i], (0, 0, 148), 2)
+            cv.line(frame2, novoArray[i - 1], novoArray[i], (0, 0, 148), 2)
 
 
 def getAngle(pt1, pt2, pt3):
@@ -87,9 +102,10 @@ while cap.isOpened():
     key = cv.waitKey(10)
     # ---------------loop video---------------
     if not ret:
-        frameArray.clear
+        novoArray.clear()
+        paintedPoints.clear()
         cv.destroyAllWindows()
-        cap = cv.VideoCapture("serving2v2.mp4")
+        cap = cv.VideoCapture("servingv2.mp4")
         hasFrame, frame = cap.read()
 
     frame = cv.resize(frame, [480, 480], interpolation=cv.INTER_BITS)
@@ -112,8 +128,10 @@ while cap.isOpened():
     print(keypoints_with_scores)
 
     # desenha o frame com os pontos
-    draw_connections(frame, keypoints_with_scores, EDGES, 0.2)
-    draw_keypoints(frame, keypoints_with_scores, 0.2)
+    draw_connections(frame, keypoints_with_scores, EDGES, 0.20)
+    draw_keypoints(frame, keypoints_with_scores, 0.20)
+
+
 
     # ------------------------ANGLES---------------------------------
     y, x, c = frame.shape
@@ -164,7 +182,8 @@ while cap.isOpened():
         paintedPoints.appendleft([shaped[interestPoint][1], shaped[interestPoint][0]])
         savedPaintedPoints.append(shaped[interestPoint])
 
-    motionTrail(paintedPoints)
+    if len(paintedPoints) > 7:
+        motionTrail(paintedPoints)
 
     frame = cv.resize(frame, [480, 360], interpolation=cv.INTER_BITS)
     frame2 = cv.resize(frame2, [480, 360], interpolation=cv.INTER_BITS)
@@ -177,17 +196,16 @@ while cap.isOpened():
     if key == ord('p'):
         cv.waitKey(-1)  # wait until any key is pressed
 
-        # ------------------MANIPULANDO VIDEO/FRAMES-----------------
+        # ------------------MANIPULANDO VIDEO/FRAMES-----------------q
     if key == ord('j'):
         cv.destroyWindow('tela')
         cv.destroyWindow('tela2')
-        #cv.destroyWindow('Pontos')
         frame3 = np.zeros((255, 255, 3), np.uint8)
         cv.imshow('Frame3', frameArray[0])
         counter = 0
         i = 0
-        while key != ord('q'):
 
+        while key != ord('q'):
             # -------------START/PAUSE------------------
             if key == ord('p'):
                 while True:
