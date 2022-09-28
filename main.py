@@ -1,6 +1,8 @@
+from ctypes.wintypes import POINT
+
 import tensorflow as tf
 import numpy as np
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt3
 import cv2 as cv
 from collections import deque
 from scipy.spatial import distance as dist
@@ -11,7 +13,7 @@ from tensorflow.python.framework.test_ops import old
 interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_lightning_3.tflite")
 interpreter.allocate_tensors()
 
-video = "servoriginalv3.mp4"
+video = "mauro4v2.mp4"
 cap = cv.VideoCapture(video)
 
 EDGES = {
@@ -197,36 +199,66 @@ while cap.isOpened():
     # ----------------------DESENHA MOTION TRACKING--------------------
     # mao direita
     if key == ord("1"):
-        pointsToPaint.clear()
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
         interestPoint = 10
     # mao equerda
     if key == ord("2"):
-        pointsToPaint.clear()
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
         interestPoint = 9
     # joelho direito
     if key == ord("3"):
-        pointsToPaint.clear()
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
         interestPoint = 14
     # joelho esquerdo
     if key == ord("4"):
-        pointsToPaint.clear()
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
         interestPoint = 13
     # quadril direito
     if key == ord("5"):
-        pointsToPaint.clear()
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
         interestPoint = 12
     # quadril esquerdo
     if key == ord("6"):
-        pointsToPaint.clear()
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
         interestPoint = 11
     # pe direito
     if key == ord("7"):
-        pointsToPaint.clear()
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
         interestPoint = 16
     # pe esquerdo
     if key == ord("8"):
-        pointsToPaint.clear()
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
         interestPoint = 15
+    if key == ord("0"):
+        pointsToPaint = pointsToPaint.clear()
+        pointsToPaint = deque(maxlen=40)
+        novoArray = novoArray.clear()
+        novoArray = deque(maxlen=40)
+        interestPoint = 0
 
     if interestPoint is not 0:
         pointsToPaint.appendleft([shaped[interestPoint][1], shaped[interestPoint][0]])
@@ -247,7 +279,7 @@ while cap.isOpened():
         oldFrame = frame
         cv.setMouseCallback("tela", clickEvent)
         cv.waitKey(-1)
-        cv.destroyAllWindows()
+        #cv.destroyAllWindows()
 
     # ------------------MANIPULANDO VIDEO/FRAMES-----------------q
     if key == ord('j'):
