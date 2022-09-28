@@ -6,11 +6,12 @@ from collections import deque
 from scipy.spatial import distance as dist
 
 from tensorflow.lite.python.interpreter import Interpreter
+from tensorflow.python.framework.test_ops import old
 
 interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_lightning_3.tflite")
 interpreter.allocate_tensors()
 1
-video = "servoriginalv3.mp4"
+video = "deadliftv2.mp4"
 cap = cv.VideoCapture(video)
 
 EDGES = {
@@ -33,15 +34,30 @@ EDGES = {
     (12, 14): 'c',
     (14, 16): 'c'
 }
-pointsToPaint = deque(maxlen=20)
+pointsToPaint = deque(maxlen=40)
 interestPoint = 0
 frameArray = []
-novoArray = deque(maxlen=20)
+novoArray = deque(maxlen=40)
+
+
+def clickEvent(event, x, y, flag, param):
+    yFrame, xFrame, cFrame = frame.shape
+    if event == cv.EVENT_LBUTTONDOWN:
+        cv.line(frame, (x, y), (xFrame, y), (255, 0, 255), 2)
+        cv.line(frame, (x, y), (0, y), (255, 0, 255), 2)
+
+        cv.line(frame, (x, y), (x, yFrame), (255, 0, 255), 2)
+        cv.line(frame, (x, y), (x, 0), (255, 0, 255), 2)
+        cv.imshow("tela", frame)
 
 
 def motionTrail(paintedPoints):
-    mediaX1 = np.sum(paintedPoints[0][0] + paintedPoints[1][0] + paintedPoints[2][0] + paintedPoints[3][0] + paintedPoints[4][0] + paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0])
-    mediaY1 = np.sum(paintedPoints[0][1] + paintedPoints[1][1] + paintedPoints[2][1] + paintedPoints[3][1] + paintedPoints[4][1] + paintedPoints[5][1] + paintedPoints[6][1] + paintedPoints[7][1])
+    mediaX1 = np.sum(
+        paintedPoints[0][0] + paintedPoints[1][0] + paintedPoints[2][0] + paintedPoints[3][0] + paintedPoints[4][0] +
+        paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0])
+    mediaY1 = np.sum(
+        paintedPoints[0][1] + paintedPoints[1][1] + paintedPoints[2][1] + paintedPoints[3][1] + paintedPoints[4][1] +
+        paintedPoints[5][1] + paintedPoints[6][1] + paintedPoints[7][1])
 
     mediaX2 = np.sum(
         paintedPoints[8][0] + paintedPoints[9][0] + paintedPoints[10][0] + paintedPoints[11][0] + paintedPoints[12][0] +
@@ -65,7 +81,7 @@ def motionTrail(paintedPoints):
             cv.line(frame2, novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
 
 
-def getAngle(pt1, pt2, pt3):
+def getAngle(pt1, pt2, pt3, index):
     ypt1, xpt1 = pt1
 
     radians = np.arctan2(pt3[1] - pt1[1], pt3[0] - pt1[0]) - np.arctan2(pt2[1] - pt1[1], pt2[0] - pt1[0])
@@ -75,21 +91,39 @@ def getAngle(pt1, pt2, pt3):
         angle = 360 - angle
     cv.putText(frame2, str(angle), (int(xpt1), int(ypt1)), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv.LINE_AA)
 
+    if index == 5:
+        cv.putText(frameAngles, "OMBRO E.: " + str(angle), (0, 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    if index == 6:
+        cv.putText(frameAngles, "OMBRO D.: " + str(angle), (0, 40), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    if index == 7:
+        cv.putText(frameAngles, "COTOVELO E.: " + str(angle), (0, 60), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    if index == 8:
+        cv.putText(frameAngles, "COTOVELO D.: " + str(angle), (0, 80), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    if index == 11:
+        cv.putText(frameAngles, "QUADRIL E.: " + str(angle), (0, 100), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    if index == 12:
+        cv.putText(frameAngles, "QUADRIL D.: " + str(angle), (0, 120), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    if index == 13:
+        cv.putText(frameAngles, "JOELHO E.: " + str(angle), (0, 140), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    if index == 14:
+        cv.putText(frameAngles, "JOELHO D.: " + str(angle), (0, 160), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    cv.imshow("tela3", frameAngles)
+
 
 def draw_keypoints(frame, keypoints, confidence_threshold):
     y, x, c = frame.shape
-    shaped = np.squeeze(np.multiply(keypoints, [y, x, 1])) #multiplica pelo tamanho widht e height da imagem
+    shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))  # multiplica pelo tamanho widht e height da imagem
 
     for kp in shaped:
         ky, kx, kp_conf = kp
-        if kp_conf > confidence_threshold: #se nivel confianca for maior que confidence_threshold
+        if kp_conf > confidence_threshold:  # se nivel confianca for maior que confidence_threshold
             cv.circle(frame, (int(kx), int(ky)), 4, (0, 255, 0), -1)
             cv.circle(frame2, (int(kx), int(ky)), 4, (0, 255, 0), -1)
 
 
 def draw_connections(frame, keypoints, edges, confidence_threshold):
     y, x, c = frame.shape
-    shaped = np.squeeze(np.multiply(keypoints, [y, x, 1])) #multiplica pelo tamanho widht e height da imagem
+    shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))  # multiplica pelo tamanho widht e height da imagem
 
     for edge, color in edges.items():
         p1, p2 = edge
@@ -114,8 +148,9 @@ while cap.isOpened():
 
     frame = cv.resize(frame, [480, 480], interpolation=cv.INTER_BITS)
     frame2 = np.zeros((frame.shape[0], frame.shape[1], 3), np.uint8)  # criacao imagem preta
+    frameAngles = np.zeros((180, 160, 3), np.uint8)
 
-    #---------------------- TENSOR FLOW ----------------------------------------
+    # ---------------------- TENSOR FLOW ----------------------------------------
     # reshape imagem para 192x192x3 (padrao documento do modelo treinado)
     img = frame.copy()
     img = tf.image.resize_with_pad(np.expand_dims(img, axis=0), 192, 192)
@@ -142,22 +177,22 @@ while cap.isOpened():
     shaped = old_shaped.astype(int)
     shaped = np.delete(shaped, 2, 1)
 
-    if (old_shaped[6][2] and old_shaped[8][2] and old_shaped[12][2]) > 0.25:#ombro dir (6)
-        getAngle(shaped[6], shaped[8], shaped[12])
+    if (old_shaped[6][2] and old_shaped[8][2] and old_shaped[12][2]) > 0.25:  # ombro dir (6)
+        getAngle(shaped[6], shaped[8], shaped[12], 6)
     if (old_shaped[5][2] and old_shaped[7][2] and old_shaped[11][2]) > 0.25:  # ombro esq (5)
-        getAngle(shaped[5], shaped[7], shaped[11])
+        getAngle(shaped[5], shaped[7], shaped[11], 5)
     if (old_shaped[8][2] and old_shaped[6][2] and old_shaped[10][2]) > 0.25:  # cotovelo dir (8)
-        getAngle(shaped[8], shaped[6], shaped[10])
+        getAngle(shaped[8], shaped[6], shaped[10], 8)
     if (old_shaped[7][2] and old_shaped[5][2] and old_shaped[9][2]) > 0.25:  # cotovelo esq (7)
-        getAngle(shaped[7], shaped[5], shaped[9])
+        getAngle(shaped[7], shaped[5], shaped[9], 7)
     if (old_shaped[12][2] and old_shaped[6][2] and old_shaped[14][2]) > 0.25:  # qadril dir (12)
-        getAngle(shaped[12], shaped[6], shaped[14])
+        getAngle(shaped[12], shaped[6], shaped[14], 12)
     if (old_shaped[11][2] and old_shaped[5][2] and old_shaped[13][2]) > 0.25:  # quadril esq (11)
-        getAngle(shaped[11], shaped[5], shaped[13])
-    if (old_shaped[14][2] and old_shaped[12][2] and old_shaped[16][2]) > 0.25:# joelho dir (14)
-        getAngle(shaped[14], shaped[12], shaped[16])
-    if (old_shaped[13][2] and old_shaped[11][2] and old_shaped[15][2]) > 0.25:# joelho esq (13)
-        getAngle(shaped[13], shaped[11], shaped[15])
+        getAngle(shaped[11], shaped[5], shaped[13], 11)
+    if (old_shaped[14][2] and old_shaped[12][2] and old_shaped[16][2]) > 0.25:  # joelho dir (14)
+        getAngle(shaped[14], shaped[12], shaped[16], 14)
+    if (old_shaped[13][2] and old_shaped[11][2] and old_shaped[15][2]) > 0.25:  # joelho esq (13)
+        getAngle(shaped[13], shaped[11], shaped[15], 13)
 
     # ----------------------DESENHA MOTION TRACKING--------------------
     # mao direita
@@ -199,22 +234,26 @@ while cap.isOpened():
     if len(pointsToPaint) > 15:
         motionTrail(pointsToPaint)
 
-  #---------------------------- SAIDA TELA ---------------------------
+    # ---------------------------- SAIDA TELA ---------------------------
     frame = cv.resize(frame, [480, 360], interpolation=cv.INTER_BITS)
     frame2 = cv.resize(frame2, [480, 360], interpolation=cv.INTER_BITS)
     frameArray.append(frame2)
     cv.imshow("tela2", frame2)
     cv.imshow("tela", frame)
 
-    if key == ord('q'): #QUIT
+    if key == ord('q'):  # QUIT
         break
-    if key == ord('p'): #PAUSE
+    if key == ord('p'):  # PAUSE
+        oldFrame = frame
+        cv.setMouseCallback("tela", clickEvent)
         cv.waitKey(-1)
+        cv.destroyAllWindows()
 
-        # ------------------MANIPULANDO VIDEO/FRAMES-----------------q
+    # ------------------MANIPULANDO VIDEO/FRAMES-----------------q
     if key == ord('j'):
         cv.destroyWindow('tela')
         cv.destroyWindow('tela2')
+        cv.destroyWindow('tela3')
         frame3 = np.zeros((255, 255, 3), np.uint8)
         cv.imshow('Frame3', frameArray[0])
         counter = 0
@@ -267,4 +306,4 @@ while cap.isOpened():
         cv.destroyAllWindows()
 
 cap.release()
-cv.destroyWindow()
+cv.destroyAllWindows()
