@@ -10,8 +10,8 @@ from tensorflow.python.framework.test_ops import old
 
 interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_lightning_3.tflite")
 interpreter.allocate_tensors()
-1
-video = "deadliftv2.mp4"
+
+video = "servoriginalv3.mp4"
 cap = cv.VideoCapture(video)
 
 EDGES = {
@@ -131,7 +131,7 @@ def draw_connections(frame, keypoints, edges, confidence_threshold):
         y2, x2, c2 = shaped[p2]
 
         if (c1 > confidence_threshold) & (c2 > confidence_threshold):
-            cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
+            cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 1)
             cv.line(frame2, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
 
 
@@ -185,13 +185,13 @@ while cap.isOpened():
         getAngle(shaped[8], shaped[6], shaped[10], 8)
     if (old_shaped[7][2] and old_shaped[5][2] and old_shaped[9][2]) > 0.25:  # cotovelo esq (7)
         getAngle(shaped[7], shaped[5], shaped[9], 7)
-    if (old_shaped[12][2] and old_shaped[6][2] and old_shaped[14][2]) > 0.25:  # qadril dir (12)
+    if (old_shaped[12][2] and old_shaped[6][2] and old_shaped[14][2]) > 0.4:  # qadril dir (12)
         getAngle(shaped[12], shaped[6], shaped[14], 12)
-    if (old_shaped[11][2] and old_shaped[5][2] and old_shaped[13][2]) > 0.25:  # quadril esq (11)
+    if (old_shaped[11][2] and old_shaped[5][2] and old_shaped[13][2]) > 0.4:  # quadril esq (11)
         getAngle(shaped[11], shaped[5], shaped[13], 11)
-    if (old_shaped[14][2] and old_shaped[12][2] and old_shaped[16][2]) > 0.25:  # joelho dir (14)
+    if (old_shaped[14][2] and old_shaped[12][2] and old_shaped[16][2]) > 0.4:  # joelho dir (14)
         getAngle(shaped[14], shaped[12], shaped[16], 14)
-    if (old_shaped[13][2] and old_shaped[11][2] and old_shaped[15][2]) > 0.25:  # joelho esq (13)
+    if (old_shaped[13][2] and old_shaped[11][2] and old_shaped[15][2]) > 0.4:  # joelho esq (13)
         getAngle(shaped[13], shaped[11], shaped[15], 13)
 
     # ----------------------DESENHA MOTION TRACKING--------------------
