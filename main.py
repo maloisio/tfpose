@@ -43,6 +43,7 @@ i = 0
 video = 0
 cap = None
 frameCount = 0
+varPlayAux = False
 
 
 def clickEvent(event, x, y, flag, param):
@@ -238,26 +239,51 @@ def volta():
 
 def seguido():
     global i
+    global varPlayAux
 
-    if i > 0:
-        for i in np.arange(i, len(frameArray)):
-            im = Image.fromarray(frameArray[i])
-            im2 = ImageTk.PhotoImage(image=im)
-            gui.lblVideo.configure(image=im2)
-            gui.lblVideo.image = im2
-
-            time.sleep(0.02)
-            gui.win.update()
-
+    if varPlayAux:
+        varPlayAux = False
     else:
-        for i in np.arange(1, len(frameArray)):
-            im = Image.fromarray(frameArray[i])
-            im2 = ImageTk.PhotoImage(image=im)
-            gui.lblVideo.configure(image=im2)
-            gui.lblVideo.image = im2
+        varPlayAux = True
 
-            time.sleep(0.02)
-            gui.win.update()
+    gui.guiWhenPlayingFrames()
+
+    if varPlayAux:
+        if i > 0:
+            for i in np.arange(i, len(frameArray)):
+                im = Image.fromarray(frameArray[i])
+                im2 = ImageTk.PhotoImage(image=im)
+                gui.lblVideo.configure(image=im2)
+                gui.lblVideo.image = im2
+
+                time.sleep(0.02)
+                gui.win.update()
+                if not varPlayAux:
+                    break
+
+        else:
+            for i in np.arange(1, len(frameArray)):
+                im = Image.fromarray(frameArray[i])
+                im2 = ImageTk.PhotoImage(image=im)
+                gui.lblVideo.configure(image=im2)
+                gui.lblVideo.image = im2
+
+                time.sleep(0.02)
+                gui.win.update()
+                if not varPlayAux:
+                    break
+    else:
+        im = Image.fromarray(frameArray[i])
+        im2 = ImageTk.PhotoImage(image=im)
+        gui.lblVideo.configure(image=im2)
+        gui.lblVideo.image = im2
+
+        time.sleep(0.02)
+        gui.win.update()
+
+def stop():
+    pass
+
 
 
 def metaVideo():

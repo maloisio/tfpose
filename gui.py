@@ -48,6 +48,12 @@ def guiStartLoadedFrames():
     win.update()
 
 
+def guiWhenPlayingFrames():
+    #btn_previous_frame.place_forget()
+    #btn_next_frame.place_forget()
+    win.update()
+
+
 def guiManipulLoadedFrames():
     btn_manipul_frames.place(x=30, y=450, width=40)
     win.update()
@@ -79,9 +85,10 @@ add_video_menu.add_command(label="Webcam", command=main.addWebcam)
 
 btn_manipul_frames = Button(win, text="⏏", bg="gray", fg="white", command=main.reprise)
 btn_start_frames = Button(win, text="▶", bg="gray", fg="white", command=main.start)
-btn_run_frames = Button(win, text="▶", bg="gray", fg="white", command=main.seguido)
+btn_run_frames = Button(win, text="⏯", bg="gray", fg="white", command=main.seguido)
 btn_next_frame = Button(win, text="▶", bg="gray", fg="white", command=main.frente)
 btn_previous_frame = Button(win, text="◀", bg="gray", fg="white", command=main.volta)
+btn_previous_stop = Button(win, text="⏯", bg="gray", fg="white", command=main.stop)
 
 varBarra = DoubleVar()
 varBarra.set(0)
