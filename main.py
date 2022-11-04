@@ -34,6 +34,23 @@ EDGES = {
     (14, 16): 'c'
 }
 pointsToPaint = deque(maxlen=40)
+
+pointsToPaintMd = []
+pointsToPaintMdDeq = deque(maxlen=40)
+
+pointsToPaintMe = deque(maxlen=40)
+pointsToPaintOd = deque(maxlen=40)
+pointsToPaintOe = deque(maxlen=40)
+pointsToPaintPd = deque(maxlen=40)
+pointsToPaintPe = deque(maxlen=40)
+
+pointsToPaintJd = deque(maxlen=40)
+pointsToPaintJe = deque(maxlen=40)
+pointsToPaintQd = deque(maxlen=40)
+pointsToPaintQe = deque(maxlen=40)
+pointsToPaintPd = deque(maxlen=40)
+pointsToPaintPe = deque(maxlen=40)
+
 interestPoint = 0
 frameArray = []
 frameArrayOriginal = []
@@ -44,6 +61,7 @@ video = 0
 cap = None
 frameCount = 0
 varPlayAux = False
+speedVar = 0.015
 
 
 def clickEvent(event, x, y, flag, param):
@@ -57,7 +75,7 @@ def clickEvent(event, x, y, flag, param):
         cv.imshow("tela", frame)
 
 
-def motionTrail(paintedPoints):
+def motionTrail(paintedPoints, frameCount):
     mediaX1 = np.sum(
         paintedPoints[0][0] + paintedPoints[1][0] + paintedPoints[2][0] + paintedPoints[3][0] + paintedPoints[4][0] +
         paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0])
@@ -80,11 +98,41 @@ def motionTrail(paintedPoints):
             continue
 
         if dist.euclidean(novoArray[i], novoArray[i - 1]) < 60:
-            cv.line(frame, novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
-            cv.line(frame2, novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
+            cv.line(frameArrayOriginal[frameCount], novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
+            cv.line(frameArray[frameCount], novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
         else:
-            cv.line(frame, novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
-            cv.line(frame2, novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
+            cv.line(frameArrayOriginal[frameCount], novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
+            cv.line(frameArray[frameCount], novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
+
+# def motionTrail(paintedPoints):
+#     mediaX1 = np.sum(
+#         paintedPoints[0][0] + paintedPoints[1][0] + paintedPoints[2][0] + paintedPoints[3][0] + paintedPoints[4][0] +
+#         paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0])
+#     mediaY1 = np.sum(
+#         paintedPoints[0][1] + paintedPoints[1][1] + paintedPoints[2][1] + paintedPoints[3][1] + paintedPoints[4][1] +
+#         paintedPoints[5][1] + paintedPoints[6][1] + paintedPoints[7][1])
+#
+#     mediaX2 = np.sum(
+#         paintedPoints[8][0] + paintedPoints[9][0] + paintedPoints[10][0] + paintedPoints[11][0] + paintedPoints[12][0] +
+#         paintedPoints[13][0] + paintedPoints[14][0] + paintedPoints[15][0])
+#     mediaY2 = np.sum(
+#         paintedPoints[8][1] + paintedPoints[9][1] + paintedPoints[10][1] + paintedPoints[11][1] + paintedPoints[12][1] +
+#         paintedPoints[13][1] + paintedPoints[14][1] + paintedPoints[15][1])
+#
+#     novoArray.appendleft([int(mediaX1 / 8), int(mediaY1 / 8)])
+#     novoArray.appendleft([int(mediaX2 / 8), int(mediaY2 / 8)])
+#
+#     for i in np.arange(1, len(novoArray)):
+#         if novoArray[i - 1] is None or novoArray[i] is None:
+#             continue
+#
+#         if dist.euclidean(novoArray[i], novoArray[i - 1]) < 60:
+#             cv.line(frame, novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
+#             cv.line(frame2, novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
+#         else:
+#             cv.line(frame, novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
+#             cv.line(frame2, novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
+#
 
 
 def getAngle(pt1, pt2, pt3, index):
@@ -191,6 +239,7 @@ def addWebcam():
     gui.lblVideo.image = im2
 
 
+# ------------------------------------- FUNCOES BOTOES ----------------------------------------------
 def parar():
     global running
     running = False
@@ -240,50 +289,39 @@ def volta():
 def seguido():
     global i
     global varPlayAux
+    global speedVar
 
     if varPlayAux:
         varPlayAux = False
     else:
         varPlayAux = True
 
-    gui.guiWhenPlayingFrames()
-
     if varPlayAux:
         if i > 0:
             for i in np.arange(i, len(frameArray)):
-                im = Image.fromarray(frameArray[i])
+                hori2 = np.concatenate((frameArrayOriginal[i], frameArray[i], frameArrayAngles[i]), axis=1)
+                im = Image.fromarray(hori2)
                 im2 = ImageTk.PhotoImage(image=im)
                 gui.lblVideo.configure(image=im2)
                 gui.lblVideo.image = im2
 
-                time.sleep(0.02)
+                time.sleep(speedVar)
                 gui.win.update()
                 if not varPlayAux:
                     break
 
         else:
             for i in np.arange(1, len(frameArray)):
-                im = Image.fromarray(frameArray[i])
+                hori2 = np.concatenate((frameArrayOriginal[i], frameArray[i], frameArrayAngles[i]), axis=1)
+                im = Image.fromarray(hori2)
                 im2 = ImageTk.PhotoImage(image=im)
                 gui.lblVideo.configure(image=im2)
                 gui.lblVideo.image = im2
 
-                time.sleep(0.02)
+                time.sleep(speedVar)
                 gui.win.update()
                 if not varPlayAux:
                     break
-    else:
-        im = Image.fromarray(frameArray[i])
-        im2 = ImageTk.PhotoImage(image=im)
-        gui.lblVideo.configure(image=im2)
-        gui.lblVideo.image = im2
-
-        time.sleep(0.02)
-        gui.win.update()
-
-def stop():
-    pass
-
 
 
 def metaVideo():
@@ -291,62 +329,22 @@ def metaVideo():
     return totalFrames
 
 
-# # ------------------MANIPULANDO VIDEO/FRAMES-----------------q
-# if key == ord('j'):
-#     # cv.destroyWindow('tela')
-#     # cv.destroyWindow('tela2')
-#     # cv.destroyWindow('tela3')
-#     cv.destroyWindow('hori')
-#     frame3 = np.zeros((255, 255, 3), np.uint8)
-#     cv.imshow('Frame3', frameArray[0])
-#     counter = 0
-#     i = 0
-#
-#     while key != ord('q'):
-#         # -------------START/PAUSE------------------
-#         if key == ord('p'):
-#             while True:
-#                 if i > 0:
-#                     for i in np.arange(i, len(frameArray)):
-#                         cv.imshow('Frame3', frameArray[i])
-#                         key = cv.waitKey(50)
-#                         if key == ord('r'):
-#                             i = 0
-#                             break
-#                         if key == ord('p'):
-#                             break
-#                 else:
-#                     for i in np.arange(1, len(frameArray)):
-#                         cv.imshow('Frame3', frameArray[i])
-#                         key = cv.waitKey(50)
-#                         if key == ord('r'):
-#                             i = 0
-#                             break
-#                         if key == ord('p'):
-#                             break
-#                 break
-#
-#         # -----------AVANÇAR FRAME-------------
-#         if key == ord('l'):
-#             if i < len(frameArray) - 1:
-#                 i = 1 + i
-#                 cv.imshow('Frame3', frameArray[i])
-#
-#         # ----------VOLTAR FRAME--------------
-#         if key == ord('k'):
-#             if i > 0:
-#                 i = i - 1
-#                 cv.imshow('Frame3', frameArray[i])
-#
-#         # ----------RESTART------------------
-#         if key == ord('r'):
-#             i = 0
-#             cv.imshow('Frame3', frameArray[i])
-#
-#         key = cv.waitKey(1)
-#         if key == ord('q'):
-#             break
-#     cv.destroyAllWindows()
+def speed2x():
+    global speedVar
+    speedVar = 0.015
+
+
+def speed1x():
+    global speedVar
+    speedVar = 0.03
+
+#------------------------------ ATIVAR MOTION TRAILL----------------------------------
+
+
+def motionTrailMd():
+    if len(pointsToPaintMd) > 15:
+        motionTrail(pointsToPaintMd, frameCount)
+# ---------------------------------------------------------
 
 
 def visu():
@@ -416,11 +414,11 @@ def visu():
             # ----------------------DESENHA MOTION TRACKING--------------------
             # mao direita
             # if key == ord("1"):
-            #     pointsToPaint = pointsToPaint.clear()
-            #     pointsToPaint = deque(maxlen=40)
-            #     novoArray = novoArray.clear()
-            #     novoArray = deque(maxlen=40)
-            #     interestPoint = 10
+            # pointsToPaint = pointsToPaint.clear()
+            # pointsToPaint = deque(maxlen=40)
+            # novoArray = novoArray.clear()
+            # novoArray = deque(maxlen=40)
+            # interestPoint = 10
             # # mao equerda
             # if key == ord("2"):
             #     pointsToPaint = pointsToPaint.clear()
@@ -476,12 +474,18 @@ def visu():
             #     novoArray = novoArray.clear()
             #     novoArray = deque(maxlen=40)
             #     interestPoint = 0
+
+            pointsToPaintMd.append([shaped[10][1], shaped[10][0]])
+            # pointsToPaintMe.appendleft([shaped[9][1], shaped[9][0]])
             #
-            # if interestPoint is not 0:
-            #     pointsToPaint.appendleft([shaped[interestPoint][1], shaped[interestPoint][0]])
+            # pointsToPaintJd.appendleft([shaped[3][1], shaped[3][0]])
+            # pointsToPaintJe.appendleft([shaped[4][1], shaped[4][0]])
             #
-            # if len(pointsToPaint) > 15:
-            #     motionTrail(pointsToPaint)
+            # pointsToPaintQd.appendleft([shaped[5][1], shaped[5][0]])
+            # pointsToPaintQe.appendleft([shaped[6][1], shaped[6][0]])
+            #
+            # pointsToPaintPd.appendleft([shaped[7][1], shaped[7][0]])
+            # pointsToPaintPe.appendleft([shaped[8][1], shaped[8][0]])
 
             # ---------------------------- SAIDA TELA ---------------------------
             frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
@@ -516,6 +520,20 @@ def visu():
             #     cv.setMouseCallback("hori", clickEvent)
             #     cv.waitKey(-1)
             #     # cv.destroyAllWindows()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def visuRealTime():

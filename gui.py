@@ -39,6 +39,8 @@ def guiStartLoadedFrames():
         btn_next_frame.place_forget()
         btn_run_frames.place_forget()
         btn_previous_frame.place_forget()
+        btn_1x.place_forget()
+        btn_2x.place_forget()
 
         win.update()
 
@@ -48,27 +50,27 @@ def guiStartLoadedFrames():
     win.update()
 
 
-def guiWhenPlayingFrames():
-    #btn_previous_frame.place_forget()
-    #btn_next_frame.place_forget()
-    win.update()
-
-
 def guiManipulLoadedFrames():
     btn_manipul_frames.place(x=30, y=450, width=40)
     win.update()
 
+
 def guiManipulLoadedFramesDelete():
     btn_manipul_frames.place_forget()
     win.update()
+
 
 def guiManipulCommands():
     global btn_next_frame, btn_run_frames, btn_previous_frame, btn_start_frames, btn_stop
 
     btn_start_frames.place_forget()
     btn_run_frames.place(x=30, y=500, width=40)
-    btn_next_frame.place(x=120, y=500, width=40)
-    btn_previous_frame.place(x=70, y=500, width=40)
+    btn_next_frame.place(x=130, y=500, width=40)
+    btn_previous_frame.place(x=80, y=500, width=40)
+    btn_2x.place(x=30, y=550, width=40)
+    btn_1x.place(x=80, y=550, width=40)
+
+    btn_MotionTrail_Md.place(x=300, y=550, width=40)
 
     win.update()
 
@@ -88,7 +90,11 @@ btn_start_frames = Button(win, text="▶", bg="gray", fg="white", command=main.s
 btn_run_frames = Button(win, text="⏯", bg="gray", fg="white", command=main.seguido)
 btn_next_frame = Button(win, text="▶", bg="gray", fg="white", command=main.frente)
 btn_previous_frame = Button(win, text="◀", bg="gray", fg="white", command=main.volta)
-btn_previous_stop = Button(win, text="⏯", bg="gray", fg="white", command=main.stop)
+
+btn_MotionTrail_Md = Button(win, text="MD", bg="gray", fg="white", command=main.motionTrailMd)
+
+btn_2x = Button(win, text="2x", bg="gray", fg="white", command=main.speed2x)
+btn_1x = Button(win, text="1x", bg="gray", fg="white", command=main.speed1x)
 
 varBarra = DoubleVar()
 varBarra.set(0)
