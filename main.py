@@ -37,6 +37,7 @@ pointsToPaint = deque(maxlen=40)
 
 pointsToPaintMd = []
 pointsToPaintMdDeq = deque(maxlen=40)
+mTactive = False
 
 pointsToPaintMe = deque(maxlen=40)
 pointsToPaintOd = deque(maxlen=40)
@@ -51,19 +52,27 @@ pointsToPaintQe = deque(maxlen=40)
 pointsToPaintPd = deque(maxlen=40)
 pointsToPaintPe = deque(maxlen=40)
 
+# globalFrameIndex = 0
 interestPoint = 0
 frameArray = []
 frameArrayOriginal = []
 frameArrayAngles = []
+
+frameArrayOriginalTemp = []
+frameArrayTemp = []
+
+frameArray2 = []
+frameArrayOriginal2 = []
 novoArray = deque(maxlen=40)
-i = 0
+globalFrameIndex = 0
 video = 0
 cap = None
 frameCount = 0
 varPlayAux = False
-speedVar = 0.015
+varPlayAuxMd = False
+speedVar = 0.03
 
-
+framteTeste = []
 def clickEvent(event, x, y, flag, param):
     yFrame, xFrame, cFrame = frame.shape
     if event == cv.EVENT_LBUTTONDOWN:
@@ -75,7 +84,13 @@ def clickEvent(event, x, y, flag, param):
         cv.imshow("tela", frame)
 
 
-def motionTrail(paintedPoints, frameCount):
+def motionTrail(paintedPoints):
+    global globalFrameIndex, frameArrayOriginal2, frameArray2
+
+    # paintedPoints = pointsToPaint[:globalFrameIndex]
+
+    # paintedPoints = paintedPoints[-40:]
+
     mediaX1 = np.sum(
         paintedPoints[0][0] + paintedPoints[1][0] + paintedPoints[2][0] + paintedPoints[3][0] + paintedPoints[4][0] +
         paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0])
@@ -98,11 +113,14 @@ def motionTrail(paintedPoints, frameCount):
             continue
 
         if dist.euclidean(novoArray[i], novoArray[i - 1]) < 60:
-            cv.line(frameArrayOriginal[frameCount], novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
-            cv.line(frameArray[frameCount], novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
+            cv.line(frameArrayOriginal2[globalFrameIndex], novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
+            cv.line(frameArray2[globalFrameIndex], novoArray[i - 1], novoArray[i], (255, 0, 255), 2)
+
         else:
-            cv.line(frameArrayOriginal[frameCount], novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
-            cv.line(frameArray[frameCount], novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
+            cv.line(frameArrayOriginal2[globalFrameIndex], novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
+            cv.line(frameArray2[globalFrameIndex], novoArray[i - 1], novoArray[i], (0, 255, 255), 2)
+
+
 
 # def motionTrail(paintedPoints):
 #     mediaX1 = np.sum(
@@ -252,9 +270,14 @@ def start():
 
 
 def reprise():
-    global running, i
+    global running, globalFrameIndex, varPlayAuxMd, frameArrayOriginalTemp, frameArrayTemp, frameArrayOriFake
 
-    i = 0
+    #frameArrayTemp = frameArrayTemp.clear()
+    #frameArrayTemp = []
+
+
+    varPlayAuxMd = False
+    globalFrameIndex = 0
     running = False
     hori2 = np.concatenate((frameArrayOriginal[0], frameArray[0], frameArrayAngles[0]), axis=1)
     im = Image.fromarray(hori2)
@@ -265,10 +288,12 @@ def reprise():
 
 
 def frente():
-    global i
-    if i < len(frameArray) - 1:
-        i = 1 + i
-        hori2 = np.concatenate((frameArrayOriginal[i], frameArray[i], frameArrayAngles[i]), axis=1)
+    global globalFrameIndex, globalFrameIndex
+    if globalFrameIndex < len(frameArray) - 1:
+        globalFrameIndex = 1 + globalFrameIndex
+        hori2 = np.concatenate(
+            (frameArrayOriginal[globalFrameIndex], frameArray[globalFrameIndex], frameArrayAngles[globalFrameIndex]),
+            axis=1)
         im = Image.fromarray(hori2)
         im2 = ImageTk.PhotoImage(image=im)
         gui.lblVideo.configure(image=im2)
@@ -276,10 +301,12 @@ def frente():
 
 
 def volta():
-    global i
-    if i > 0:
-        i = i - 1
-        hori2 = np.concatenate((frameArrayOriginal[i], frameArray[i], frameArrayAngles[i]), axis=1)
+    global globalFrameIndex, globalFrameIndex
+    if globalFrameIndex > 0:
+        globalFrameIndex = globalFrameIndex - 1
+        hori2 = np.concatenate(
+            (frameArrayOriginal[globalFrameIndex], frameArray[globalFrameIndex], frameArrayAngles[globalFrameIndex]),
+            axis=1)
         im = Image.fromarray(hori2)
         im2 = ImageTk.PhotoImage(image=im)
         gui.lblVideo.configure(image=im2)
@@ -287,9 +314,14 @@ def volta():
 
 
 def seguido():
-    global i
-    global varPlayAux
-    global speedVar
+    global varPlayAux, varPlayAuxMd
+    global speedVar, globalFrameIndex, pointsToPaintMdDeq
+
+    varPlayAuxMd = False
+    pointsToPaintMdDeq = pointsToPaintMdDeq.clear()
+    pointsToPaintMdDeq = deque(maxlen=40)
+    frameArrayOriginalTemp = []
+    frameArrayTemp = []
 
     if varPlayAux:
         varPlayAux = False
@@ -297,27 +329,31 @@ def seguido():
         varPlayAux = True
 
     if varPlayAux:
-        if i > 0:
-            for i in np.arange(i, len(frameArray)):
-                hori2 = np.concatenate((frameArrayOriginal[i], frameArray[i], frameArrayAngles[i]), axis=1)
-                im = Image.fromarray(hori2)
+
+        if globalFrameIndex > 0:
+            for globalFrameIndex in np.arange(globalFrameIndex, len(frameArray)):
+                hori = np.concatenate((frameArrayOriginal[globalFrameIndex], frameArray[globalFrameIndex],
+                                        frameArrayAngles[globalFrameIndex]), axis=1)
+                im = Image.fromarray(hori)
                 im2 = ImageTk.PhotoImage(image=im)
                 gui.lblVideo.configure(image=im2)
                 gui.lblVideo.image = im2
-
+                print("ESTOU AQUI NORMAL")
                 time.sleep(speedVar)
                 gui.win.update()
                 if not varPlayAux:
                     break
 
         else:
-            for i in np.arange(1, len(frameArray)):
-                hori2 = np.concatenate((frameArrayOriginal[i], frameArray[i], frameArrayAngles[i]), axis=1)
-                im = Image.fromarray(hori2)
+            for globalFrameIndex in np.arange(1, len(frameArray)):
+                hori = np.concatenate((frameArrayOriginal[globalFrameIndex], frameArray[globalFrameIndex],
+                                        frameArrayAngles[globalFrameIndex]), axis=1)
+                im = Image.fromarray(hori)
                 im2 = ImageTk.PhotoImage(image=im)
                 gui.lblVideo.configure(image=im2)
                 gui.lblVideo.image = im2
 
+                print("ESTOU AQUI NORMAL")
                 time.sleep(speedVar)
                 gui.win.update()
                 if not varPlayAux:
@@ -338,18 +374,50 @@ def speed1x():
     global speedVar
     speedVar = 0.03
 
-#------------------------------ ATIVAR MOTION TRAILL----------------------------------
+
+# ------------------------------ ATIVAR MOTION TRAILL----------------------------------
 
 
 def motionTrailMd():
-    if len(pointsToPaintMd) > 15:
-        motionTrail(pointsToPaintMd, frameCount)
+    global mTactive, frameArrayOriginal2, frameArrayTemp, novoArray, frameArray2, pointsToPaintMdDeq, globalFrameIndex, globalFrameIndex, varPlayAuxMd
+    mTactive = True
+    #globalFrameIndex = 0
+    #pointsToPaintMdDeq = pointsToPaintMdDeq.clear()
+    #pointsToPaintMdDeq = deque(maxlen=40)
+
+
+    if varPlayAuxMd:
+        varPlayAuxMd = False
+    else:
+        varPlayAuxMd = True
+
+    if varPlayAuxMd:
+        #if globalFrameIndex > 0:
+        for globalFrameIndex in np.arange(globalFrameIndex, len(frameArray)):
+            pointsToPaintMdDeq.appendleft(pointsToPaintMd[globalFrameIndex])
+            if len(pointsToPaintMdDeq) > 15:
+                motionTrail(pointsToPaintMdDeq)
+            hori2 = np.concatenate((frameArrayOriginal2[globalFrameIndex], frameArray2[globalFrameIndex],
+                                    frameArrayAngles[globalFrameIndex]), axis=1)
+            print("ESTOU AQUI NORMAL MDDDDDDDDDDDDDDDD")
+            im = Image.fromarray(hori2)
+            im2 = ImageTk.PhotoImage(image=im)
+            gui.lblVideo.configure(image=im2)
+            gui.lblVideo.image = im2
+            time.sleep(speedVar)
+            gui.win.update()
+
+            if not varPlayAuxMd:
+                break
+
+
+
 # ---------------------------------------------------------
 
 
 def visu():
     global cap, frame2, novoArray, pointsToPaint, frameAngles, frame, interestPoint, \
-        pointsToPaint, frameArray, frameArrayOriginal, video, frameCount, totalFrames
+        pointsToPaint, frameArray, frameArrayOriginal,frameArrayOriginal2, frameArray2, video, frameCount, totalFrames
 
     ret, frame = cap.read()
 
@@ -475,7 +543,7 @@ def visu():
             #     novoArray = deque(maxlen=40)
             #     interestPoint = 0
 
-            pointsToPaintMd.append([shaped[10][1], shaped[10][0]])
+            pointsToPaintMd.append([shaped[10][1], shaped[10][0], frameCount])
             # pointsToPaintMe.appendleft([shaped[9][1], shaped[9][0]])
             #
             # pointsToPaintJd.appendleft([shaped[3][1], shaped[3][0]])
@@ -494,6 +562,8 @@ def visu():
             frame2 = cv.resize(frame2, [480, 360], interpolation=cv.INTER_BITS)
             frameArray.append(frame2)
             frameArrayOriginal.append(frame)
+            frameArrayOriginal2.append(frame)
+            frameArray2.append(frame2)
             frameArrayAngles.append(frameAngles)
 
             # hori = np.concatenate((frame, frame2, frameAngles), axis=1)
@@ -520,20 +590,6 @@ def visu():
             #     cv.setMouseCallback("hori", clickEvent)
             #     cv.waitKey(-1)
             #     # cv.destroyAllWindows()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def visuRealTime():
