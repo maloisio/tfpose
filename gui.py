@@ -129,7 +129,7 @@ def guiVisualizarVideo():
 
     frame_video_Array_Gravacao.place(x=430, y=10, width=400, height=300)
     frame_video_Original_Gravacao.place(x=20, y=10, width=400, height=300)
-    frame_manipul_frames_gravacao.place(x=220, y=370, width=330, height=65)
+    frame_manipul_frames_gravacao.place(x=240, y=330, width=360, height=65)
 
     lblVideoGravacaoOriginal = Label(frame_video_Original_Gravacao)
     lblVideoGravacaoOriginal.grid()
