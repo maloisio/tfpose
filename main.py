@@ -102,14 +102,14 @@ corAttGreen = 0
 corAttBlue = 0
 attThr = 0.25
 
-ombroDangulo = None
-ombroEangulo = None
-joelhoDangulo = None
-joelhoEangulo = None
-quadrilDangulo = None
-quadrilEangulo = None
-cotoveloDangulo = None
-cotoveloEangulo = None
+ombroDangulo = 0
+ombroEangulo = 0
+joelhoDangulo = 0
+joelhoEangulo = 0
+quadrilDangulo = 0
+quadrilEangulo = 0
+cotoveloDangulo = 0
+cotoveloEangulo = 0
 
 anguloOmbroD = None
 anguloOmbroE = None
@@ -124,7 +124,10 @@ setInterestAngleToColor = [None] * 16
 
 startGravacao = False
 varPlayAuxFramesGravacao = False
-speedVarVideoGravacao= 0.03
+speedVarVideoGravacao = 0.03
+
+anglesToCompare = []
+
 
 def motionTrail(paintedPoints):
     global globalFrameIndex, frameArrayOriginal2, frameArray2
@@ -135,17 +138,17 @@ def motionTrail(paintedPoints):
 
     mediaX1 = np.sum(
         paintedPoints[0][0] + paintedPoints[1][0] + paintedPoints[2][0] + paintedPoints[3][0] + paintedPoints[4][0] +
-        paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0])
+        paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0] + paintedPoints[8][0])
     mediaY1 = np.sum(
         paintedPoints[0][1] + paintedPoints[1][1] + paintedPoints[2][1] + paintedPoints[3][1] + paintedPoints[4][1] +
-        paintedPoints[5][1] + paintedPoints[6][1] + paintedPoints[7][1])
+        paintedPoints[5][1] + paintedPoints[6][1] + paintedPoints[7][1] + paintedPoints[8][1])
 
     mediaX2 = np.sum(
-        paintedPoints[8][0] + paintedPoints[9][0] + paintedPoints[10][0] + paintedPoints[11][0] + paintedPoints[12][0] +
-        paintedPoints[13][0] + paintedPoints[14][0] + paintedPoints[15][0])
+        paintedPoints[9][0] + paintedPoints[10][0] + paintedPoints[11][0] + paintedPoints[12][0] + paintedPoints[13][0] +
+        paintedPoints[14][0] + paintedPoints[15][0] + paintedPoints[16][0] + paintedPoints[17][0])
     mediaY2 = np.sum(
-        paintedPoints[8][1] + paintedPoints[9][1] + paintedPoints[10][1] + paintedPoints[11][1] + paintedPoints[12][1] +
-        paintedPoints[13][1] + paintedPoints[14][1] + paintedPoints[15][1])
+        paintedPoints[9][1] + paintedPoints[10][1] + paintedPoints[11][1] + paintedPoints[12][1] + paintedPoints[13][1] +
+        paintedPoints[14][1] + paintedPoints[15][1] + paintedPoints[16][1] + paintedPoints[17][1])
 
     novoArray.appendleft([int(mediaX1 / 8), int(mediaY1 / 8)])
     novoArray.appendleft([int(mediaX2 / 8), int(mediaY2 / 8)])
@@ -168,31 +171,32 @@ def motionTrailRealTime(paintedPoints):
 
     mediaX1 = np.sum(
         paintedPoints[0][0] + paintedPoints[1][0] + paintedPoints[2][0] + paintedPoints[3][0] + paintedPoints[4][0] +
-        paintedPoints[5][0] + paintedPoints[6][0] + paintedPoints[7][0])
+        paintedPoints[5][0] + paintedPoints[6][0])
+
     mediaY1 = np.sum(
         paintedPoints[0][1] + paintedPoints[1][1] + paintedPoints[2][1] + paintedPoints[3][1] + paintedPoints[4][1] +
-        paintedPoints[5][1] + paintedPoints[6][1] + paintedPoints[7][1])
+        paintedPoints[5][1] + paintedPoints[6][0])
 
     mediaX2 = np.sum(
-        paintedPoints[8][0] + paintedPoints[9][0] + paintedPoints[10][0] + paintedPoints[11][0] + paintedPoints[12][0] +
-        paintedPoints[13][0] + paintedPoints[14][0] + paintedPoints[15][0])
+        paintedPoints[7][0] + paintedPoints[8][0] + paintedPoints[9][0] + paintedPoints[10][0] + paintedPoints[11][0] +
+        paintedPoints[12][0] + paintedPoints[13][0])
     mediaY2 = np.sum(
-        paintedPoints[8][1] + paintedPoints[9][1] + paintedPoints[10][1] + paintedPoints[11][1] + paintedPoints[12][1] +
-        paintedPoints[13][1] + paintedPoints[14][1] + paintedPoints[15][1])
+        paintedPoints[7][1] + paintedPoints[8][1] + paintedPoints[9][1] + paintedPoints[10][1] + paintedPoints[11][1] +
+        paintedPoints[12][1] + paintedPoints[13][0])
 
-    novoArray.appendleft([int(mediaX1 / 8), int(mediaY1 / 8)])
-    novoArray.appendleft([int(mediaX2 / 8), int(mediaY2 / 8)])
+    novoArray.appendleft([int(mediaX1 / 7), int(mediaY1 / 7)])
+    novoArray.appendleft([int(mediaX2 / 7), int(mediaY2 / 7)])
 
     for i in np.arange(1, len(novoArray)):
         if novoArray[i - 1] is None or novoArray[i] is None:
             continue
 
         if dist.euclidean(novoArray[i], novoArray[i - 1]) < 60:
-            cv.line(frame, novoArray[i - 1], novoArray[i], (corAttMtBlue, corAttMtGreen, corAttMtRed), 2)
-            cv.line(frame2, novoArray[i - 1], novoArray[i], (corAttMtBlue, corAttMtGreen, corAttMtRed), 2)
+            cv.line(frame, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 2)
+            cv.line(frame2, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 2)
         else:
-            cv.line(frame, novoArray[i - 1], novoArray[i], (corAttMtBlue, corAttMtGreen, corAttMtRed), 2)
-            cv.line(frame2, novoArray[i - 1], novoArray[i], (corAttMtBlue, corAttMtGreen, corAttMtRed), 2)
+            cv.line(frame, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 2)
+            cv.line(frame2, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 2)
 
 
 def getAngle(pt1, pt2, pt3, index):
@@ -271,8 +275,8 @@ def draw_keypoints(frame, keypoints, confidence_threshold):
     for kp in shaped:
         ky, kx, kp_conf = kp
         if kp_conf > confidence_threshold:  # se nivel confianca for maior que confidence_threshold
-            cv.circle(frame, (int(kx), int(ky)), 4, (corAttPointsBlue, corAttPointsGreen, corAttPointsRed), -1)
-            cv.circle(frame2, (int(kx), int(ky)), 4, (corAttPointsBlue, corAttPointsGreen, corAttPointsRed), -1)
+            cv.circle(frame, (int(kx), int(ky)), 4, (corAttPointsRed, corAttPointsGreen, corAttPointsBlue), -1)
+            cv.circle(frame2, (int(kx), int(ky)), 4, (corAttPointsRed, corAttPointsGreen, corAttPointsBlue), -1)
 
 
 def draw_connections(frame, keypoints, edges, confidence_threshold):
@@ -287,9 +291,9 @@ def draw_connections(frame, keypoints, edges, confidence_threshold):
         y2, x2, c2 = shaped[p2]
 
         if (c1 > confidence_threshold) & (c2 > confidence_threshold):
-            cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (corAttLinesBlue, corAttLinesGreen, corAttLinesRed),
+            cv.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (corAttLinesRed, corAttLinesGreen, corAttLinesBlue),
                     1)
-            cv.line(frame2, (int(x1), int(y1)), (int(x2), int(y2)), (corAttLinesBlue, corAttLinesGreen, corAttLinesRed),
+            cv.line(frame2, (int(x1), int(y1)), (int(x2), int(y2)), (corAttLinesRed, corAttLinesGreen, corAttLinesBlue),
                     2)
 
 
@@ -434,7 +438,6 @@ def volta():
         im2 = ImageTk.PhotoImage(image=im)
         gui.lblVideo2.configure(image=im2)
         gui.lblVideo2.image = im2
-
 
 
 def seguido():
@@ -706,6 +709,7 @@ def saveFoto():
     global fotoToSave
     try:
         # frameFotoOriginal = cv.cvtColor(frameFotoOriginal, cv.COLOR_BGR2RGB)
+        fotoToSave = cv.cvtColor(fotoToSave, cv.COLOR_RGB2BGR)
         export_file_path = filedialog.asksaveasfilename(filetypes=(('image', '*.jpg'), ('All', '*.*')),
                                                         defaultextension='*.jpg')
         cv.imwrite(export_file_path, fotoToSave)
@@ -767,29 +771,13 @@ def pararGravacaoVideo():
     startGravacao = False
 
 
-#------------------------------------- BOTOES GRAVACAO ---------------------------
-
+# ------------------------------------- BOTOES GRAVACAO ---------------------------
 def newSecondWindow():
     gui.guiVisualizarVideo()
 
 
 def visualizarVideoGravacao():
     global frameVideoOriginal, frameVideoArray, globalFrameIndexVideo, varPlayAuxFramesGravacao
-
-    # outputFrameVideoArrayOriginal = frameVideoOriginal[0]
-    # outputFrameVideoArray = frameVideoArray[0]
-    #
-    # im = Image.fromarray(outputFrameVideoArrayOriginal)
-    # im2 = ImageTk.PhotoImage(image=im)
-    # gui.lblVideoGravacaoOriginal.configure(image=im2)
-    # gui.lblVideoGravacaoOriginal.image = im2
-    #
-    # im = Image.fromarray(outputFrameVideoArray)
-    # im2 = ImageTk.PhotoImage(image=im)
-    # gui.lblVideoGravacaoArray.configure(image=im2)
-    # gui.lblVideoGravacaoArray.image = im2
-    #
-    # gui.secondWindow.update()
 
     if varPlayAuxFramesGravacao:
         varPlayAuxFramesGravacao = False
@@ -926,15 +914,41 @@ def voltaVideoGravacao():
 # -------------------------------- ENTRYS -------------------------------------------
 def atualizarAngles():
     global ombroDangulo, ombroEangulo, joelhoDangulo, joelhoEangulo, quadrilDangulo, quadrilEangulo, cotoveloDangulo, cotoveloEangulo
+    global anglesToCompare
+
+    anglesToCompare = []
 
     ombroDangulo = gui.varAngleOd.get()
+    if ombroDangulo == 0 or ombroDangulo == '':
+        ombroDangulo = None
+
     ombroEangulo = gui.varAngleOe.get()
+    if ombroEangulo == 0 or ombroEangulo == '':
+        ombroEangulo = None
+
     cotoveloDangulo = gui.varAngleCd.get()
+    if cotoveloDangulo == 0 or cotoveloDangulo == '':
+        cotoveloDangulo = None
+
     cotoveloEangulo = gui.varAngleCe.get()
+    if cotoveloEangulo == 0 or cotoveloEangulo == '':
+        cotoveloEangulo = None
+
     quadrilDangulo = gui.varAngleQd.get()
+    if quadrilDangulo == 0 or quadrilDangulo == '':
+        quadrilDangulo = None
+
     quadrilEangulo = gui.varAngleQe.get()
+    if quadrilEangulo == 0 or quadrilEangulo == '':
+        quadrilEangulo = None
+
     joelhoDangulo = gui.varAngleJd.get()
+    if joelhoDangulo == 0 or joelhoDangulo == '':
+        joelhoDangulo = None
+
     joelhoEangulo = gui.varAngleJe.get()
+    if joelhoEangulo == 0 or joelhoEangulo == '':
+        joelhoEangulo = None
 
 
 # --------------------------------- SCALES ---------------------------------
@@ -1146,7 +1160,7 @@ def addWebcam():
 
     global joelhoDangulo
     global setInterestAngleToColor
-    global frameFoto, frameFotoOriginal, frameFotoArray, frameVideoOriginal, frameVideoArray
+    global frameFoto, frameFotoOriginal, frameFotoArray, frameVideoOriginal, frameVideoArray, anglesToCompare
 
     gui.guiWebcam()
     running = False
@@ -1168,15 +1182,14 @@ def addWebcam():
     angleQe = None
     angleJd = None
     angleJe = None
-    setAngle = None
 
     while runningWeb:
         ret, frame = cap.read()
         frame = cv.resize(frame, [480, 360], interpolation=cv.INTER_BITS)
-        # frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+        frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
         frame = cv.resize(frame, [480, 480], interpolation=cv.INTER_BITS)
         frame2 = np.zeros((frame.shape[0], frame.shape[1], 3), np.uint8)  # criacao imagem preta
-        frameAngles = np.zeros((360, 160, 3), np.uint8)
+        #frameAngles = np.zeros((360, 160, 3), np.uint8)
 
         # ---------------------- TENSOR FLOW ----------------------------------------
         # reshape imagem para 192x192x3 (padrao documento do modelo treinado)
@@ -1253,59 +1266,35 @@ def addWebcam():
                 motionTrailRealTime(pointsToPaint)
 
         # -------------------------COMPARADOR DE ANGULOS----------------------------------
-        # if ombroDangulo is not None:
-        #     if angleOd in range(int(ombroDangulo) - 10, int(ombroDangulo) + 10):
-        #         setInterestAngleToColor[5] = 6
-        #
-        # if ombroEangulo is not None:
-        #     if angleOe in range(int(ombroEangulo) - 10, int(ombroEangulo) + 10):
-        #         setInterestAngleToColor[4] = 5
+        if (ombroEangulo is None or angleOe in range(int(ombroEangulo) - 2, int(ombroEangulo) + 2)) and \
+                (ombroDangulo is None or angleOd in range(int(ombroDangulo) - 2, int(ombroDangulo) + 2)) and \
+                (cotoveloDangulo is None or angleCd in range(int(cotoveloDangulo) - 2, int(cotoveloDangulo) + 2)) and \
+                (cotoveloEangulo is None or angleCe in range(int(cotoveloEangulo) - 2, int(cotoveloEangulo) + 2)) and \
+                (joelhoDangulo is None or angleJd in range(int(joelhoDangulo) - 2, int(joelhoDangulo) + 2)) and \
+                (joelhoEangulo is None or angleJe in range(int(joelhoEangulo) - 2, int(joelhoEangulo) + 2)) and \
+                (quadrilDangulo is None or angleQd in range(int(quadrilDangulo) - 2, int(quadrilDangulo) + 2)) and \
+                (quadrilEangulo is None or angleQe in range(int(quadrilEangulo) - 2, int(quadrilEangulo) + 2)):
+            frameFoto = frame
+            frameFotoOriginal = frame
+            frameFotoArray = frame2
+            frameFoto = cv.resize(frameFoto, [235, 180], interpolation=cv.INTER_BITS)
+            im = Image.fromarray(frameFoto)
+            im2 = ImageTk.PhotoImage(image=im)
+            gui.lblFoto.configure(image=im2)
+            gui.lblFoto.image = im2
 
-        if cotoveloDangulo is not None:
-            if angleCd in range(int(cotoveloDangulo) - 1, int(cotoveloDangulo) + 1):
-                frameFoto = frame
-                frameFotoOriginal = frame
-                frameFotoArray = frame2
-                frameFoto = cv.cvtColor(frameFoto, cv.COLOR_BGR2RGB)
-                frameFoto = cv.resize(frameFoto, [235, 180], interpolation=cv.INTER_BITS)
-                im = Image.fromarray(frameFoto)
-                im2 = ImageTk.PhotoImage(image=im)
-                gui.lblFoto.configure(image=im2)
-                gui.lblFoto.image = im2
-
-        # if cotoveloEangulo is not None:
-        #     if angleCe in range(int(cotoveloEangulo) - 10, int(cotoveloEangulo) + 10):
-        #         setInterestAngleToColor[6] = 7
-        #
-        # if joelhoDangulo is not None:
-        #     if angleJd in range(int(joelhoDangulo) - 10, int(joelhoDangulo) + 10):
-        #         setInterestAngleToColor[13] = 14
-        #
-        # if joelhoEangulo is not None:
-        #     if angleJe in range(int(joelhoEangulo) - 10, int(joelhoEangulo) + 10):
-        #         setInterestAngleToColor[12] = 13
-        #
-        # if quadrilDangulo is not None:
-        #     if angleQd in range(int(quadrilDangulo) - 10, int(quadrilDangulo) + 10):
-        #         setInterestAngleToColor[11] = 12
-        #
-        # if quadrilEangulo is not None:
-        #     if angleQe in range(int(quadrilEangulo) - 10, int(quadrilEangulo) + 10):
-        #         setInterestAngleToColor[10] = 11
 
         # ---------------------------- SAIDA TELA ---------------------------
-        frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-        frame2 = cv.cvtColor(frame2, cv.COLOR_BGR2RGB)
+        #frame = cv.cvtColor(frame, cv.COLOR_RGB2BGR)
+        #frame2 = cv.cvtColor(frame2, cv.COLOR_RGB2BGR)
         frame = cv.resize(frame, [400, 300], interpolation=cv.INTER_BITS)
         frame2 = cv.resize(frame2, [400, 300], interpolation=cv.INTER_BITS)
-        frameArray.append(frame2)
-        frameArrayOriginal.append(frame)
 
-        #--------------------- OPCOES DA GRAVACAO -------------------------
-
+        # --------------------- OPCOES DA GRAVACAO -------------------------
         if startGravacao:
             frameVideoOriginal.append(frame)
             frameVideoArray.append(frame2)
+
 
         im = Image.fromarray(frame)
         im2 = ImageTk.PhotoImage(image=im)
@@ -1318,227 +1307,3 @@ def addWebcam():
         gui.lblVideo2.image = im2
 
         gui.win.update()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def clickEvent(event, x, y, flag, param):
-#     yFrame, xFrame, cFrame = frame.shape
-#     if event == cv.EVENT_LBUTTONDOWN:
-#         cv.line(frame, (x, y), (xFrame, y), (255, 0, 255), 2)
-#         cv.line(frame, (x, y), (0, y), (255, 0, 255), 2)
-#
-#         cv.line(frame, (x, y), (x, yFrame), (255, 0, 255), 2)
-#         cv.line(frame, (x, y), (x, 0), (255, 0, 255), 2)
-#         cv.imshow("tela", frame)
-
-
-# def visuRealTime():
-#     global cap, frame2, novoArray, pointsToPaint, frameAngles, frame, interestPoint, \
-#         pointsToPaint, frameArray, frameArrayOriginal, video, frameCount, totalFrames
-#
-#     ret, frame = cap.read()
-#
-#     if ret:
-#         key = cv.waitKey(10)
-#
-#         # --------------- LOOP VIDEO ---------------
-#         if not ret:
-#             novoArray.clear()
-#             pointsToPaint.clear()
-#             cv.destroyAllWindows()
-#             cap = cv.VideoCapture(video)
-#             hasFrame, frame = cap.read()
-#
-#         frame = cv.resize(frame, [480, 480], interpolation=cv.INTER_BITS)
-#         frame2 = np.zeros((frame.shape[0], frame.shape[1], 3), np.uint8)  # criacao imagem preta
-#         frameAngles = np.zeros((360, 160, 3), np.uint8)
-#
-#         # ---------------------- TENSOR FLOW ----------------------------------------
-#         # reshape imagem para 192x192x3 (padrao documento do modelo treinado)
-#         img = frame.copy()
-#         img = tf.image.resize_with_pad(np.expand_dims(img, axis=0), 192, 192)
-#         input_image = tf.cast(img, dtype=tf.float32)
-#         # plt.imshow(tf.cast(np.squeeze(img), dtype=tf.int32))
-#
-#         # inputs e ouputs
-#         input_details = interpreter.get_input_details()
-#         output_details = interpreter.get_output_details()
-#
-#         # predicoes e pontos
-#         interpreter.set_tensor(input_details[0]['index'], np.array(input_image))
-#         interpreter.invoke()
-#         keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
-#         print(keypoints_with_scores)
-#
-#         # ------------------ PONTOS E RETAS -----------------------------
-#         draw_connectionsRealTime(frame, keypoints_with_scores, EDGES, 0.25)
-#         draw_keypoints(frame, keypoints_with_scores, 0.25)
-#
-#         # ------------------------ANGLES---------------------------------
-#         y, x, c = frame.shape
-#         old_shaped = np.squeeze(np.multiply(keypoints_with_scores, [y, x, c]))
-#         shaped = old_shaped.astype(int)
-#         shaped = np.delete(shaped, 2, 1)
-#
-#         if (old_shaped[6][2] and old_shaped[8][2] and old_shaped[12][2]) > 0.25:  # ombro dir (6)
-#             getAngle(shaped[6], shaped[8], shaped[12], 6)
-#         if (old_shaped[5][2] and old_shaped[7][2] and old_shaped[11][2]) > 0.25:  # ombro esq (5)
-#             getAngle(shaped[5], shaped[7], shaped[11], 5)
-#         if (old_shaped[8][2] and old_shaped[6][2] and old_shaped[10][2]) > 0.25:  # cotovelo dir (8)
-#             getAngle(shaped[8], shaped[6], shaped[10], 8)
-#         if (old_shaped[7][2] and old_shaped[5][2] and old_shaped[9][2]) > 0.25:  # cotovelo esq (7)
-#             getAngle(shaped[7], shaped[5], shaped[9], 7)
-#         if (old_shaped[12][2] and old_shaped[6][2] and old_shaped[14][2]) > 0.4:  # qadril dir (12)
-#             getAngle(shaped[12], shaped[6], shaped[14], 12)
-#         if (old_shaped[11][2] and old_shaped[5][2] and old_shaped[13][2]) > 0.4:  # quadril esq (11)
-#             getAngle(shaped[11], shaped[5], shaped[13], 11)
-#         if (old_shaped[14][2] and old_shaped[12][2] and old_shaped[16][2]) > 0.4:  # joelho dir (14)
-#             getAngle(shaped[14], shaped[12], shaped[16], 14)
-#         if (old_shaped[13][2] and old_shaped[11][2] and old_shaped[15][2]) > 0.4:  # joelho esq (13)
-#             getAngle(shaped[13], shaped[11], shaped[15], 13)
-#
-#         # ----------------------DESENHA MOTION TRACKING--------------------
-#         # mao direita
-#         if key == ord("1"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 10
-#         # # mao equerda
-#         if key == ord("2"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 9
-#         # # joelho direito
-#         if key == ord("3"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 14
-#         # # joelho esquerdo
-#         if key == ord("4"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 13
-#         # # quadril direito
-#         if key == ord("5"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 12
-#         # # quadril esquerdo
-#         if key == ord("6"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 11
-#         # # pe direito
-#         if key == ord("7"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 16
-#         # # pe esquerdo
-#         if key == ord("8"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 15
-#         if key == ord("0"):
-#             pointsToPaint = pointsToPaint.clear()
-#             pointsToPaint = deque(maxlen=40)
-#             novoArray = novoArray.clear()
-#             novoArray = deque(maxlen=40)
-#             interestPoint = 0
-#
-#         if interestPoint is not 0:
-#             pointsToPaint.appendleft([shaped[interestPoint][1], shaped[interestPoint][0]])
-#
-#         if len(pointsToPaint) > 15:
-#             motionTrailRealTime(pointsToPaint)
-#
-#         # ---------------------------- SAIDA TELA ---------------------------
-#         frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-#         frame2 = cv.cvtColor(frame2, cv.COLOR_BGR2RGB)
-#         frame = cv.resize(frame, [480, 360], interpolation=cv.INTER_BITS)
-#         frame2 = cv.resize(frame2, [480, 360], interpolation=cv.INTER_BITS)
-#         frameArray.append(frame2)
-#         frameArrayOriginal.append(frame)
-#         frameArrayAngles.append(frameAngles)
-#
-#         hori = np.concatenate((frame, frame2, frameAngles), axis=1)
-#         im = Image.fromarray(hori)
-#         im2 = ImageTk.PhotoImage(image=im)
-#         gui.lblVideo.configure(image=im2)
-#         gui.lblVideo.image = im2
-
-# ----- ATUALIZA PROGRESS BAR -----------
-
-# frameCount = frameCount + 1
-# print(frameCount)
-# gui.guiProgressBar(frameCount)
-# gui.win.update()
-
-# gui.lblVideo.after(1, visuRealTime())
-
-# cv.imshow("hori", hori)
-# cv.imshow("tela2", frame2)
-# cv.imshow("tela", frame)
-
-# if key == ord('p'):  # PAUSE
-#     oldFrame = frame
-#     cv.setMouseCallback("hori", clickEvent)
-#     cv.waitKey(-1)
-#     # cv.destroyAllWindows()
-
-# ----------------------------------------GUI-------------------------------------------------------
-# win = Tk()
-# win.geometry("1125x600")
-#
-# Button(win, text="▶", bg="gray", fg="white", command=start).place(x=30, y=400, width=40)
-# Button(win, text="⏸", bg="gray", fg="white", command=parar).place(x=100, y=400, width=40)
-# Button(win, text="⏏", bg="gray", fg="white", command=reprise).place(x=30, y=450, width=40)
-# # Button(win, text="Iniciar2", bg="gray", fg="white", command=start).place(x=200, y=400, width=40)
-# my_menu = Menu(win)
-# win.config(menu=my_menu)
-#
-# add_video_menu = Menu(my_menu)
-# my_menu.add_cascade(label="Abrir", menu=add_video_menu)
-# add_video_menu.add_command(label="Arquivo", command=addVideo)
-# add_video_menu.add_command(label="Webcam", command=addWebcam)
-#
-# lblVideo = Label(win)
-# lblVideo.grid(column=0, row=2, columnspan=2)
-#
-# win.mainloop()
-
-# cap.release()
-# cv.destroyAllWindows()
