@@ -18,83 +18,83 @@ frame_video_Array_Gravacao = None
 lblVideoGravacaoOriginal = None
 lblVideoGravacaoArray = None
 
-def guiCreateProgressBar(valueBarraMax):
-    global pb
-    pb = ttk.Progressbar(win, variable=varBarra, maximum=valueBarraMax)
-    pb.place(x=20, y=0)
-    win.update()
-
-
-def guiProgressBar(setValue):
-    valueBarraMax = main.metaVideo()
-    print(setValue)
-    if setValue == valueBarraMax:
-        pb.destroy()
-        guiManipulLoadedFrames()
-        win.update()
-
-    else:
-        varBarra.set(setValue)
-        pb.place(x=20, y=0)
-        win.update()
-
-
-def guiStartLoadedFrames():
-    global btn_next_frame, btn_run_frames, btn_previous_frame, btn_start_frames, btn_stop
-
-    frame_label_motion_trail.place_forget()
-    frame_label_thr.place_forget()
-
-    frame_video_ArrayOriginal.place(x=20, y=10, width=400, height=300)
-    frame_video_Array.place(x=430, y=10, width=400, height=300)
-
-    frame_manipul_frames.place(x=20, y=420, width=170, height=150)
-    frame_colors.place(x=250, y=420, width=300, height=150)
-
-    if btn_next_frame and btn_previous_frame and btn_run_frames is not NONE:
-        btn_next_frame.place_forget()
-        btn_run_frames.place_forget()
-        btn_previous_frame.place_forget()
-        btn_1x.place_forget()
-        btn_2x.place_forget()
-        btn_Menos2x.place_forget()
-
-        win.update()
-
-    btn_start_frames.place(x=30, y=380, width=40)
-    # btn_stop = Button(win, text="⏸", bg="gray", fg="white", command=main.parar)
-    # btn_stop.place(x=100, y=400, width=40)
-    win.update()
-
-
-def guiManipulLoadedFrames():
-    btn_manipul_frames.place(x=10, y=10, width=40)
-    win.update()
-
-
-def guiManipulLoadedFramesDelete():
-    btn_manipul_frames.place_forget()
-    win.update()
-
-
-def guiManipulCommands():
-    global btn_next_frame, btn_run_frames, btn_previous_frame, btn_start_frames, btn_stop
-
-    btn_start_frames.place_forget()
-    btn_run_frames.place(x=10, y=55, width=40)
-    btn_previous_frame.place(x=60, y=55, width=40)
-    btn_next_frame.place(x=110, y=55, width=40)
-    btn_Menos2x.place(x=10, y=105, width=40)
-    btn_1x.place(x=60, y=105, width=40)
-    btn_2x.place(x=110, y=105, width=40)
-
-    scale_hori_Red.place(x=10, y=10)
-    scale_hori_Green.place(x=10, y=50)
-    scale_hori_Blue.place(x=10, y=90)
-
-    btn_MotionTrail_Md_Web.place(x=600, y=550, width=40)
-    # entryAngleMd.place(x=480, y=500, width=30, height=20)
-    win.update()
+# def guiCreateProgressBar(valueBarraMax):
+#     global pb
+#     pb = ttk.Progressbar(win, variable=varBarra, maximum=valueBarraMax)
+#     pb.place(x=20, y=0)
+#     win.update()
+#
+#
+# def guiProgressBar(setValue):
+#     valueBarraMax = main.metaVideo()
+#     print(setValue)
+#     if setValue == valueBarraMax:
+#         pb.destroy()
+#         guiManipulLoadedFrames()
+#         win.update()
+#
+#     else:
+#         varBarra.set(setValue)
+#         pb.place(x=20, y=0)
+#         win.update()
+#
+#
+# def guiStartLoadedFrames():
+#     global btn_next_frame, btn_run_frames, btn_previous_frame, btn_start_frames, btn_stop
+#
+#     frame_label_motion_trail.place_forget()
+#     frame_label_thr.place_forget()
+#
+#     frame_video_ArrayOriginal.place(x=20, y=10, width=400, height=300)
+#     frame_video_Array.place(x=430, y=10, width=400, height=300)
+#
+#     frame_manipul_frames.place(x=20, y=420, width=170, height=150)
+#     frame_colors.place(x=250, y=420, width=300, height=150)
+#
+#     if btn_next_frame and btn_previous_frame and btn_run_frames is not NONE:
+#         btn_next_frame.place_forget()
+#         btn_run_frames.place_forget()
+#         btn_previous_frame.place_forget()
+#         btn_1x.place_forget()
+#         btn_2x.place_forget()
+#         btn_Menos2x.place_forget()
+#
+#         win.update()
+#
+#     btn_start_frames.place(x=30, y=380, width=40)
+#     #
+#     # btn_stop.place(x=100, y=400, width=40)
+#     win.update()
+#
+#
+# def guiManipulLoadedFrames():
+#     btn_manipul_frames.place(x=10, y=10, width=40)
+#     win.update()
+#
+#
+# def guiManipulLoadedFramesDelete():
+#     btn_manipul_frames.place_forget()
+#     win.update()
+#
+#
+# def guiManipulCommands():
+#     global btn_next_frame, btn_run_frames, btn_previous_frame, btn_start_frames, btn_stop
+#
+#     btn_start_frames.place_forget()
+#     btn_run_frames.place(x=10, y=55, width=40)
+#     btn_previous_frame.place(x=60, y=55, width=40)
+#     btn_next_frame.place(x=110, y=55, width=40)
+#     btn_Menos2x.place(x=10, y=105, width=40)
+#     btn_1x.place(x=60, y=105, width=40)
+#     btn_2x.place(x=110, y=105, width=40)
+#
+#     scale_hori_Red.place(x=10, y=10)
+#     scale_hori_Green.place(x=10, y=50)
+#     scale_hori_Blue.place(x=10, y=90)
+#
+#     btn_MotionTrail_Md_Web.place(x=600, y=550, width=40)
+#     # entryAngleMd.place(x=480, y=500, width=30, height=20)
+#     win.update()
 
 
 def guiVisualizarVideo():
@@ -116,6 +116,7 @@ def guiVisualizarVideo():
     btn_Menos2x_frames_video_gravacao = Button(frame_manipul_frames_gravacao, text="-2x", bg="gray", fg="white", command=main.speedMenos2xVideoGravacao)
     btn_1x_frames_video_gravacao = Button(frame_manipul_frames_gravacao, text="1x", bg="gray", fg="white", command=main.speed1xVideoGravacao)
     btn_2x_frames_video_gravacao = Button(frame_manipul_frames_gravacao, text="2x", bg="gray", fg="white", command=main.speed2xVideoGravacao)
+    btn_saveVideo = Button(frame_manipul_frames_gravacao, text="Salvar", bg="gray", fg="white", command=main.salvarVideo)
 
     btn_reset_frames_video_gravacao.place(x=5, y=10, width=40)
     btn_run_frames_video_gravacao.place(x=55, y=10, width=40)
@@ -127,9 +128,11 @@ def guiVisualizarVideo():
     btn_1x_frames_video_gravacao.place(x=255, y=10, width=40)
     btn_2x_frames_video_gravacao.place(x=305, y=10, width=40)
 
+    btn_saveVideo.place(x=375, y=10, width=40)
+
     frame_video_Array_Gravacao.place(x=430, y=10, width=400, height=300)
     frame_video_Original_Gravacao.place(x=20, y=10, width=400, height=300)
-    frame_manipul_frames_gravacao.place(x=240, y=330, width=360, height=65)
+    frame_manipul_frames_gravacao.place(x=240, y=330, width=450, height=65)
 
     lblVideoGravacaoOriginal = Label(frame_video_Original_Gravacao)
     lblVideoGravacaoOriginal.grid()
@@ -158,8 +161,9 @@ def guiWebcamDelete():
 
 
 def guiWebcam():
-    btn_start_frames.place_forget()
-    btn_manipul_frames.place_forget()
+    # btn_start_frames.place_forget()
+    # btn_manipul_frames.place_forget()
+
 
     frame_video_ArrayOriginal.place(x=20, y=10, width=400, height=300)
     frame_video_Array.place(x=430, y=10, width=400, height=300)
@@ -257,6 +261,16 @@ def guiWebcam():
     win.update()
 
 
+def guiVisuVideo():
+    frame_guiVideo.place(x=10, y=310, width=402, height=70)
+    btn_start_frames.place(x=10, y=5, width=40)
+    btn_stop.place(x=60, y=5, width=40)
+
+
+def guiVisuVideoDelete():
+    frame_guiVideo.place_forget()
+
+
 # ========================================= GUI ============================================
 win = Tk()
 win.geometry("1125x600")
@@ -267,7 +281,7 @@ my_menu = Menu(win)
 win.config(menu=my_menu)
 add_video_menu = Menu(my_menu)
 my_menu.add_cascade(label="Abrir", menu=add_video_menu)
-add_video_menu.add_command(label="Arquivo", command=main.addVideo)
+add_video_menu.add_command(label="Arquivo", command=main.addVid)
 add_video_menu.add_command(label="Webcam", command=main.addWebcam)
 
 # --------------------------- FRAMES ------------------------------------
@@ -292,14 +306,11 @@ frame_video_foto = Frame(frame_label_angles, bg="red")
 
 frame_angulos_separados = LabelFrame(win, bg='#EEEED5', text="Ângulos")
 
-# ----------------------------------- BOTOES ----------------------------------
-btn_manipul_frames = Button(frame_manipul_frames, text="⏏", bg="gray", fg="white", command=main.reprise)
-btn_start_frames = Button(win, text="▶", bg="gray", fg="white", command=main.start)
-btn_run_frames = Button(frame_manipul_frames, text="⏯", bg="gray", fg="white", command=main.seguido)
-btn_next_frame = Button(frame_manipul_frames, text="▶", bg="gray", fg="white", command=main.frente)
-btn_previous_frame = Button(frame_manipul_frames, text="◀", bg="gray", fg="white", command=main.volta)
 
-btn_MotionTrail_Md = Button(win, text="MD", bg="gray", fg="white", command=main.motionTrailMd)
+frame_guiVideo = Frame(win, bg='#EEEED5')
+# ----------------------------------- BOTOES ----------------------------------
+btn_start_frames = Button(frame_guiVideo, text="▶", bg="gray", fg="white", command=main.start)
+btn_stop = Button(frame_guiVideo, text="⏸", bg="gray", fg="white", command=main.parar)
 
 btn_MotionTrail_Md_Web = Button(frame_motion_trail, text="MD", bg="gray", fg="white",
                                 command=main.motionTrailMdRealTime)
@@ -344,6 +355,7 @@ btn_radio_foto_linesPoints = Radiobutton(frame_label_angles, variable=v, value=1
 btn_gravar_video = Button(frame_label_gravacao, text="Gravar", bg="gray", fg="white", command=main.gravarVideo)
 btn_pararGravacao_video = Button(frame_label_gravacao, text="Parar", bg="gray", fg="white", command=main.pararGravacaoVideo)
 btn_visualizar_video = Button(frame_label_gravacao, text="Visualizar", bg="gray", fg="white", command=main.newSecondWindow)
+
 # --------------------------------------- PROGRESS BAR --------------------------------
 varBarra = DoubleVar()
 varBarra.set(0)
