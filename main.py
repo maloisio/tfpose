@@ -116,6 +116,7 @@ mainSpeedVar = 0.02
 
 verificacaoSelectOriginalPhoto = False
 
+
 def motionTrailRealTime(paintedPoints):
     global corAttMtBlue, corAttMtGreen, corAttMtRed
 
@@ -125,28 +126,32 @@ def motionTrailRealTime(paintedPoints):
 
     mediaY1 = np.sum(
         paintedPoints[0][1] + paintedPoints[1][1] + paintedPoints[2][1] + paintedPoints[3][1] + paintedPoints[4][1] +
-        paintedPoints[5][1] + paintedPoints[6][0])
+        paintedPoints[5][1] + paintedPoints[6][1])
 
     mediaX2 = np.sum(
         paintedPoints[7][0] + paintedPoints[8][0] + paintedPoints[9][0] + paintedPoints[10][0] + paintedPoints[11][0] +
         paintedPoints[12][0] + paintedPoints[13][0])
     mediaY2 = np.sum(
         paintedPoints[7][1] + paintedPoints[8][1] + paintedPoints[9][1] + paintedPoints[10][1] + paintedPoints[11][1] +
-        paintedPoints[12][1] + paintedPoints[13][0])
+        paintedPoints[12][1] + paintedPoints[13][1])
 
     novoArray.appendleft([int(mediaX1 / 7), int(mediaY1 / 7)])
     novoArray.appendleft([int(mediaX2 / 7), int(mediaY2 / 7)])
 
-    for i in np.arange(1, len(novoArray)):
-        if novoArray[i - 1] is None or novoArray[i] is None:
+    for i in np.arange(2, len(novoArray)):
+        if novoArray[i - 2] is None or novoArray[i] is None:
             continue
 
-        if dist.euclidean(novoArray[i], novoArray[i - 1]) < 60:
-            cv.line(frame, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 2)
-            cv.line(frame2, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 2)
-        else:
-            cv.line(frame, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 2)
-            cv.line(frame2, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 2)
+
+        cv.line(frame, novoArray[i - 2], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 5)
+        cv.line(frame2, novoArray[i], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 5)
+
+        # if dist.euclidean(novoArray[i], novoArray[i - 1]) < 60:
+        #     cv.line(frame, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 3)
+        #     cv.line(frame2, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtBlue), 3)
+        # else:
+        #     cv.line(frame, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtRed), 2)
+        #     cv.line(frame2, novoArray[i - 1], novoArray[i], (corAttMtRed, corAttMtGreen, corAttMtRed), 2)
 
 
 def getAngleRealTime(pt1, pt2, pt3, interestPoint):
@@ -538,7 +543,7 @@ def salvarVideo():
     #export_file_path = filedialog.asksaveasfilename(filetypes=(('video', '*.avi'), ('All', '*.*')),defaultextension='*.avi')
 
 
-    videoSave = cv.VideoWriter('video.avi', cv.VideoWriter_fourcc(*'DIVX'), 30.0, (400,600))
+    videoSave = cv.VideoWriter('video.mp4', cv.VideoWriter_fourcc('P', 'I', 'M', '1'), 20.0, (640, 480))
 
     for i in range(len(frameVideoOriginal)):
         videoSave.write(frameVideoOriginal[i])
@@ -821,6 +826,10 @@ def addVid():
             if not ret:
                 capVid = cv.VideoCapture(video)
                 ret, frame = capVid.read()
+                pointsToPaint = pointsToPaint.clear()
+                pointsToPaint = deque(maxlen=40)
+                novoArray = novoArray.clear()
+                novoArray = deque(maxlen=40)
 
             frame = cv.resize(frame, [480, 360], interpolation=cv.INTER_BITS)
             frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)

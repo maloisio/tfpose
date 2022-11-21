@@ -215,7 +215,7 @@ def guiWebcam():
     label_anguloJoelhoD_value.place(x=364, y=3)
     label_anguloJoelhoE_value.place(x=364, y=23)
 
-    label_frameAngles_valor_ombroD.place(x=120, y=35)
+    #label_frameAngles_valor_ombroD.place(x=120, y=35)
     win.update()
 
 
@@ -410,8 +410,8 @@ label_anguloQuadrilE_value = Label(frame_angulos_separados, textvariable=varAngl
 label_anguloJoelhoD_value = Label(frame_angulos_separados, textvariable=varAngleJdValue, bg='#EEEED5')
 label_anguloJoelhoE_value = Label(frame_angulos_separados, textvariable=varAngleJeValue, bg='#EEEED5')
 
-label_frameAngles_valor_ombroD = tkinter.Label(frame_angles, textvariable=varAngleCd,
-                                               bg='#CDCDB7', width=3)
+#label_frameAngles_valor_ombroD = tkinter.Label(frame_angles, textvariable=varAngleCd,
+                                               #bg='#CDCDB7', width=3)
 
 label_frameVideo_gravando = Label(frame_label_gravacao, font=("Arial", 8), text="Gravando...", bg='#EEEED5')
 
